@@ -2,6 +2,7 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
-    "content": "testing thsi sfhdhshd",
-    "important": true
+    "content": "Async + await are syntactic sugar",
+    "important": true,
+    "userId": "5ebf08c0f4e7777406b35bee"
 }
