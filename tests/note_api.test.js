@@ -13,6 +13,17 @@ beforeEach(async () => {
 
   noteObject = new Note(helper.initialNotes[1])
   await noteObject.save()
+
+  let testingUser = {
+    username: 'J-Money',
+    name: 'Joaqin Phoenix',
+    password: 'test'
+  }
+
+  // note: should seed through the API as this will transform the password --> passwordHash
+  await api.post('/api/users')
+    .send(testingUser)
+
 })
 
 test('notes are returned as json', async () => {
@@ -59,12 +70,19 @@ test('a specific note is within the returned notes', async () => {
 test('a valid note can be added', async () => {
   const newNote = {
     content: 'async/await simplifies making async calls',
-    important: true,
-    date: new Date()
+    important: true
   }
+
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username:'J-Money', password: 'test' })
+    .expect(200)
+
+  expect(loginResponse.body.token).toBeDefined()
 
   await api
     .post('/api/notes')
+    .set('Authorization', `bearer ${loginResponse.body.token}`)
     .send(newNote)
     .expect(200)
     .expect('Content-Type', /application\/json/)
@@ -83,8 +101,16 @@ test('note without content is not added', async () => {
     important: true
   }
 
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username:'J-Money', password: 'test' })
+    .expect(200)
+
+  expect(loginResponse.body.token).toBeDefined()
+
   await api
     .post('/api/notes')
+    .set('Authorization', `bearer ${loginResponse.body.token}`)
     .send(newNote)
     .expect(400)
 
